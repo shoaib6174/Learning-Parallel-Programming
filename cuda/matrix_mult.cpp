@@ -1,30 +1,6 @@
 #include <iostream>
 #include <cstdlib>
-
-int**  get_matrix(int row, int col, int v=1)
-{
-	std::cout << "creating matrix" << "\n";
-	
-
-	int** matrix = new int*[row];
-	
-	for(int i = 0; i < row; i++)
-	{
-		matrix[i] = new int[col];
-	}
-
-	for(int i=0; i < row; i++)
-	{
-		for(int j = 0; j < col; j++)
-		{
-			matrix[i][j] = v;
-		}
-	}
-	
-		
-	return matrix;
-}
-
+#include "my_utils.h"
 
 int**  mat_mult(int** A,int A_row, int A_col, int **B, int B_row, int  B_col)
 {
@@ -47,19 +23,6 @@ int**  mat_mult(int** A,int A_row, int A_col, int **B, int B_row, int  B_col)
 	
 	return C;
 
-}
-
-void print_matrix(int** matrix, int row, int col)
-{	
-	std::cout << "Printing Matrix: " << "\n";
-	for(int i = 0; i < row; i++)
-	{
-		for(int j = 0; j < col; j++)
-		{
-			std::cout << matrix[i][j] << " , ";
-		}
-		std::cout << "\n";
-	}
 }
 
 int main(int argc, char* argv[])

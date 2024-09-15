@@ -1,27 +1,8 @@
 #include <iostream>
 #include <cstdlib>
+#include "my_utils.h"
 
-int**  get_matrix(int row, int col, int v=1)
-{
-	std::cout << "creating matrix" << "\n";
-
-	int** matrix = new int*[row];
-
-	for(int i = 0; i < row; i++)
-	{
-		matrix[i] = new int[col];
-	}
-
-	for(int i=0; i < row; i++)
-	{
-		for(int j = 0; j < col; j++)
-		{
-			matrix[i][j] = v;
-		}
-	}
-
-	return matrix;
-}
+// nvcc matrix_mult_1block_1dthread.cu my_utils.cpp -o matrix_mult_1block_1dthread -x cu
 
 
 __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_row, int  B_col, int* C_d)
@@ -43,46 +24,8 @@ __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_
 
 }
 
-void print_matrix(int** matrix, int row, int col)
-{
-	std::cout << "Printing Matrix: " << "\n";
-	for(int i = 0; i < row; i++)
-	{
-		for(int j = 0; j < col; j++)
-		{
-			std::cout << matrix[i][j] << " , ";
-		}
-		std::cout << "\n";
-	}
-}
-void print_array_as_matrix(int *A,int r,int c)
-{
-	std::cout << "Printing Matrix: \n";
-	for(int i =0; i < r*c; i++)
-	{
-		std::cout << A[i] << " , ";
 
-		if (i>0 & (i+1) % c == 0)
-		{
-			std::cout << "\n";
-		}
-	}
-	std::cout << "\n";
-}
 
-int* convert_2D_to_1D(int** matrix,int r,int c)
-{
-	int * linear = new int[r * c];
-
-	for (int i = 0; i < r; i++)
-	{
-		for (int j = 0; j <c; j++)
-		{
-			linear[i*c + j] = matrix[i][j];
-		}
-	}
-	return linear;
-}
 
 int main()
 {
