@@ -10,12 +10,15 @@ __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_
 
 	int row =  threadIdx.x;
 	int col =  threadIdx.y;
-
+//	printf("(%d,%d) ", row, col);
 	int temp_sum = 0;
+
 	int row_curr = row * A_col;
-	for (int k = 0; k < A_col; k++)
+	int k;
+	for (k = 0; k < A_col; k++)
 	{
-		temp_sum += A_d[row_curr + k] * B_d[k * B_row + col];
+		temp_sum += A_d[row_curr + k] * B_d[k * B_col + col];
+
 	}
 
 	C_d[row * B_col + col ] = temp_sum;
@@ -26,23 +29,23 @@ __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_
 int main()
 {
 	int A_row = 5;
-	int A_col = 4;
+	int A_col = 290;
 
 
-	int B_row = 4;
-	int B_col = 4;
+	int B_row = 290;
+	int B_col = 10;
 
 	int** A = get_matrix(A_row, A_col);
 	int** B = get_matrix(B_row, B_col);
 
 
-	print_matrix(A, A_row, A_col);
-	print_matrix(B, B_row, B_col);
+//	print_matrix(A, A_row, A_col);
+//	print_matrix(B, B_row, B_col);
 
 	int* A_linear = convert_2D_to_1D(A, A_row, A_col);
 	int* B_linear = convert_2D_to_1D(B, B_row, B_col);
 
-	print_array_as_matrix(A_linear, A_row, A_col);
+//	print_array_as_matrix(A_linear, A_row, A_col);
 	int* C = new int[A_row * B_col];
 
 	int *A_d, *B_d, *C_d;
