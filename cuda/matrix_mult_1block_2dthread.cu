@@ -8,34 +8,20 @@
 __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_row, int  B_col, int* C_d)
 {
 
-	int i = blockIdx.x * blockDim.x + threadIdx.x;
-	int row = i / B_col;
-	int col = i % B_col;
+	int row =  threadIdx.x;
+	int col =  threadIdx.y;
 
 	int temp_sum = 0;
 	int row_curr = row * A_col;
 	for (int k = 0; k < A_col; k++)
 	{
-		temp_sum += A_d[row_curr + k] * B_d[k*B_row + col];
+		temp_sum += A_d[row_curr + k] * B_d[k * B_row + col];
 	}
 
-	C_d[i] = temp_sum;
-
-
+	C_d[row * B_col + col ] = temp_sum;
 }
 
-{
-	int * linear = new int[r * c];
 
-	for (int i = 0; i < r; i++)
-	{
-		for (int j = 0; j <c; j++)
-		{
-			linear[i*c + j] = matrix[i][j];
-		}
-	}
-	return linear;
-}
 
 int main()
 {
@@ -71,7 +57,10 @@ int main()
 	cudaMemcpy(A_d, A_linear, A_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(B_d, B_linear, B_size, cudaMemcpyHostToDevice);
 
-	mat_mult_kernel<<<1,A_row*B_col>>>(A_d, A_row, A_col, B_d, B_row, B_col, C_d);
+	dim3 DimGrid(1,1,1);
+	dim3 DimThread(A_row, B_col, 1 );
+
+	mat_mult_kernel<<<DimGrid, DimThread>>>(A_d, A_row, A_col, B_d, B_row, B_col, C_d);
 	cudaDeviceSynchronize();
 
 	cudaMemcpy(C, C_d,C_size, cudaMemcpyDeviceToHost);
