@@ -2,9 +2,20 @@
 #include <cstdlib>
 #include "my_utils.h"
 #include<cmath>
+#include <cuda_runtime.h>
 
 // nvcc matrix_mult_1block_1dthread.cu my_utils.cpp -o matrix_mult_1block_2dthread -x cu
 
+// Error checking macro
+#define CUDA_CHECK_ERROR(call)                                               \
+do {                                                                         \
+    cudaError_t err = call;                                                  \
+    if (err != cudaSuccess) {                                                \
+        std::cerr << "CUDA error in file '" << __FILE__ << "' at line "      \
+                  << __LINE__ << ": " << cudaGetErrorString(err) << std::endl;\
+        exit(EXIT_FAILURE);                                                  \
+    }                                                                        \
+} while(0)
 
 
 __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_row, int  B_col, int* C_d)
@@ -63,7 +74,11 @@ int main()
 	dim3 DimThread(4, 4, 1 );
 
 	mat_mult_kernel<<<DimGrid, DimThread>>>(A_d, A_row, A_col, B_d, B_row, B_col, C_d);
-	cudaDeviceSynchronize();
+	// Check for any errors from the kernel launch
+    CUDA_CHECK_ERROR(cudaGetLastError());
+
+    // Synchronize the device and check for any runtime errors
+    CUDA_CHECK_ERROR(cudaDeviceSynchronize());
 
 	cudaMemcpy(C, C_d,C_size, cudaMemcpyDeviceToHost);
 
