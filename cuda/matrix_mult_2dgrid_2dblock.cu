@@ -6,6 +6,7 @@
 // nvcc matrix_mult_1block_1dthread.cu my_utils.cpp -o matrix_mult_1block_2dthread -x cu
 
 
+
 __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_row, int  B_col, int* C_d)
 {
 
@@ -37,13 +38,13 @@ int main()
 	int** B = get_matrix(B_row, B_col);
 
 
-	print_matrix(A, A_row, A_col);
-	print_matrix(B, B_row, B_col);
+//	print_matrix(A, A_row, A_col);
+//	print_matrix(B, B_row, B_col);
 
 	int* A_linear = convert_2D_to_1D(A, A_row, A_col);
 	int* B_linear = convert_2D_to_1D(B, B_row, B_col);
 
-	print_array_as_matrix(A_linear, A_row, A_col);
+//	print_array_as_matrix(A_linear, A_row, A_col);
 	int* C = new int[A_row * B_col];
 
 	int *A_d, *B_d, *C_d;
