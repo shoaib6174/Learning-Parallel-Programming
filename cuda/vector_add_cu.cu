@@ -38,9 +38,9 @@ int* get_vector(int size)
 	return vec;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	int n  = 10;
+	int n  = std::atoi(argv[1]);
 	int size = n * sizeof(int);
 	int* A = get_vector(n);
 	int* B = get_vector(n);

@@ -36,14 +36,14 @@ __global__ void  mat_mult_kernel(int* A_d,int A_row, int A_col, int *B_d, int B_
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
-	int A_row = 5;
-	int A_col = 4;
+	int A_row = std::atoi(argv[1]);
+	int A_col = std::atoi(argv[2]);
 
 
-	int B_row = 4;
-	int B_col = 4;
+	int B_row = std::atoi(argv[3]);
+	int B_col = std::atoi(argv[4]);
 
 	int** A = get_matrix(A_row, A_col);
 	int** B = get_matrix(B_row, B_col);
@@ -63,22 +63,21 @@ int main()
 	int B_size = B_row * B_col * sizeof(int);
 	int C_size = A_row * B_col * sizeof(int);
 
-	cudaMalloc((void **) &A_d, A_size);
-	cudaMalloc((void **) &B_d, B_size);
-	cudaMalloc((void **) &C_d, C_size);
+	CUDA_CHECK_ERROR(cudaMalloc((void **) &A_d, A_size));
+	CUDA_CHECK_ERROR(cudaMalloc((void **) &B_d, B_size));
+	CUDA_CHECK_ERROR(cudaMalloc((void **) &C_d, C_size));
 
 	cudaMemcpy(A_d, A_linear, A_size, cudaMemcpyHostToDevice);
 	cudaMemcpy(B_d, B_linear, B_size, cudaMemcpyHostToDevice);
 
-	dim3 DimGrid(std::ceil(A_row / 4),std::ceil(B_col / 4),1);
+	dim3 DimGrid(std::ceil((float)A_row / 4),std::ceil((float)B_col / 4),1);
 	dim3 DimThread(4, 4, 1 );
 
 	mat_mult_kernel<<<DimGrid, DimThread>>>(A_d, A_row, A_col, B_d, B_row, B_col, C_d);
 	// Check for any errors from the kernel launch
-    CUDA_CHECK_ERROR(cudaGetLastError());
-
-    // Synchronize the device and check for any runtime errors
-    CUDA_CHECK_ERROR(cudaDeviceSynchronize());
+	CUDA_CHECK_ERROR(cudaGetLastError());
+	// Synchronize the device and check for any runtime errors
+	CUDA_CHECK_ERROR(cudaDeviceSynchronize());
 
 	cudaMemcpy(C, C_d,C_size, cudaMemcpyDeviceToHost);
 
