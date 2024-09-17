@@ -21,6 +21,19 @@ int**  get_matrix(int row, int col, int v=1)
 
 	return matrix;
 }
+int* get_vector(int size)
+{
+	int* vec = new int[size];
+	std::random_device rd;
+	std::mt19937 gen(rd());	
+	std::uniform_int_distribution<> distr(0, 100);
+
+	for (int i = 0; i < size; i++)
+	{
+		vec[i] = distr(gen);
+	}
+	return vec;
+}
 
 void print_matrix(int** matrix, int row, int col)
 {
