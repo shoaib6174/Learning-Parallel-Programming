@@ -3,7 +3,7 @@
 #include "my_utils.h"
 #include <cmath>
 
-#define thread_size 2;
+#define thread_size 2
 
 // Error checking macro
 #define CUDA_CHECK_ERROR(call)                                               \
@@ -18,17 +18,17 @@ do {                                                                         \
 
 __global__
 void conv2d_kernel(float* I, float* F, float* R, int r, int row, int col)
-{   
+{
     int f_size = 2*r+1;
-    
-    outRow = blockIdx.x * blockDim.x + threadIdx.x;
-    outCol = blockIdx.y * blockDim.y + threadIdx.y;
+
+    int outRow = blockIdx.x * blockDim.x + threadIdx.x;
+    int outCol = blockIdx.y * blockDim.y + threadIdx.y;
 
     float temp_sum = 0.0;
     for (int fRow = 0 ; fRow < f_size; fRow++)
     {
         for(int fCol = 0 ; fCol < f_size; fCol++)
-        {   
+        {
             int inRow = outRow - r + fRow;
             int inCol = outCol - r + fCol;
             if(inRow>=0 && inRow < row && inCol >= 0 && inCol < col)
@@ -90,15 +90,15 @@ int main(int argc, char* argv[])
     int input_size = row * col * sizeof(float);
     int filter_size = pow(2* r + 1, 2) * sizeof(float);
 
-    float *I_d, *F_d, *R_d, *R;
+    float *I_d, *F_d, *R_d;
 
-    CUDA_CHECK_ERROR( cudaMalloc(I_d, input_size));
-    CUDA_CHECK_ERROR( cudaMalloc(R_d, input_size));
-    CUDA_CHECK_ERROR( cudaMalloc(F_d, filter_size));
+    CUDA_CHECK_ERROR( cudaMalloc((void **) &I_d, input_size));
+    CUDA_CHECK_ERROR( cudaMalloc((void **) &R_d, input_size));
+    CUDA_CHECK_ERROR( cudaMalloc((void **) &F_d, filter_size));
 
 
     CUDA_CHECK_ERROR( cudaMemcpy(I_d, matrix, input_size, cudaMemcpyHostToDevice) );
-    CUDA_CHECK_ERROR( cudaMemcpy(F_d, filter, input_size, cudaMemcpyHostToDevice) );
+    CUDA_CHECK_ERROR( cudaMemcpy(F_d, filter, filter_size, cudaMemcpyHostToDevice) );
 
     dim3 DimGrid( std::ceil((float) row / thread_size ) , std::ceil((float) col / thread_size), 1 );
     dim3 DimThread(thread_size, thread_size, 1); 
@@ -106,8 +106,8 @@ int main(int argc, char* argv[])
     conv2d_kernel<<<DimGrid, DimThread>>>(I_d, F_d, R_d, r, row, col);
   
     CUDA_CHECK_ERROR(cudaGetLastError());
-	CUDA_CHECK_ERROR(cudaDeviceSynchronize());
-
+    CUDA_CHECK_ERROR(cudaDeviceSynchronize());
+    float* R = new float[row*col];
     CUDA_CHECK_ERROR( cudaMemcpy(R, R_d, input_size, cudaMemcpyDeviceToHost) );
     print_array_as_matrix(R, row, col);
 
