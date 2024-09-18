@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     dim3 DimGrid( std::ceil((float) row / thread_size ) , std::ceil((float) col / thread_size), 1 );
     dim3 DimThread(thread_size, thread_size, 1); 
 
-    convKernel <<<DimGrid, DimThread>>>(I_d, F_d, R_d, r, row, col);
+    conv2d_kernel<<<DimGrid, DimThread>>>(I_d, F_d, R_d, r, row, col);
   
     CUDA_CHECK_ERROR(cudaGetLastError());
 	CUDA_CHECK_ERROR(cudaDeviceSynchronize());
