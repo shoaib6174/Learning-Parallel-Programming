@@ -22,7 +22,7 @@ void conv2d(float* I, float* F, float* R, int r, int row, int col)
                     }
                 }
             }
-            // std::cout << temp_sum << "\n";
+            
             R[outRow*row+outCol] = temp_sum;
         }
     }
